@@ -91,15 +91,15 @@ namespace WordFinder.Models
                 CurrentStatus = Status.Scaning;
                 await Task.Run(() =>
                 {
-                   files.Clear();
-                   var scanedfiles =  Directory.EnumerateFiles(DirectoryPath, "*.txt",
-                                         new EnumerationOptions() { IgnoreInaccessible = true, RecurseSubdirectories = true });
+                    files.Clear();
+                    var scanedfiles =  Directory.EnumerateFiles(DirectoryPath, "*.txt",new EnumerationOptions() { IgnoreInaccessible = true, RecurseSubdirectories = true });
                     foreach (var file in scanedfiles) 
                     {
                         if (token.IsCancellationRequested) return;
                         files.Add(file);
                     }
                 }, token);
+
                 if (token.IsCancellationRequested)
                 {
                     CurrentStatus = Status.Idle;
@@ -159,7 +159,7 @@ namespace WordFinder.Models
             }
             catch {}
             CurrentStatus = Status.Ready;
-            if (FileInfos.Count == 0) MessageBox.Show("Word not found in this files","Message");
+            if (FileInfos.Count == 0) MessageBox.Show("Word not found in these files", "Message");
         }
 
         private void exitStop()
