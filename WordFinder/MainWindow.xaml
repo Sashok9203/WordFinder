@@ -46,12 +46,15 @@
         <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="Find word"  Command="{Binding ScanFindButton}"/>
         <Button Grid.Row="1" Grid.Column="4" Margin="5,5,10,5" Content="{Binding ExitStopButtonName}" Command="{Binding ExitStopButton}"/>
         <Button Grid.Row="3" Grid.Column="4" Margin="5,5,10,5" Content="Save result" Command="{Binding SaveResultButton}"/>
-        <DataGrid Grid.Row="2" Grid.ColumnSpan="5" Margin="10" ItemsSource="{Binding FileInfos}" AutoGenerateColumns="False" IsReadOnly="True">
+        <DataGrid Name="dataGrid" Grid.Row="2" Grid.ColumnSpan="5" Margin="10" ItemsSource="{Binding FileInfos}" AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="File name" Binding="{Binding FileName}" Width="150"/>
                 <DataGridTextColumn Header="File path" Binding="{Binding FilePath}" Width="*"/>
                 <DataGridTextColumn Header="Word count" Binding="{Binding Count}" Width="80"/>
             </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <MouseBinding  MouseAction="LeftDoubleClick" Command="{Binding DoubleClickCommand}" CommandParameter="{Binding ElementName=dataGrid, Path=SelectedItem}"/>
+            </DataGrid.InputBindings>
         </DataGrid>
         <Label Grid.Row="3" Content="Status:"/>
         <Label Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"  Content="{Binding DisplayStatus}" FontWeight="Normal" />

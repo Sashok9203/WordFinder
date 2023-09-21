@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -169,6 +170,12 @@ namespace WordFinder.Models
             if (FileInfos.Count == 0) MessageBox.Show("Word not found in these files", "Message");
         }
 
+        private void showFile(object o)
+        {
+            FileInfo fi = o as FileInfo;
+            Process.Start("notepad.exe",Path.Combine(fi.FilePath,fi.FileName));
+        }
+
         private void exitStop()
         {
             if (CurrentStatus == Status.Idle || CurrentStatus == Status.Ready) Application.Current.Shutdown();
@@ -249,6 +256,8 @@ namespace WordFinder.Models
         public RelayCommand ExitStopButton => new((o) => exitStop(),(o) => CurrentStatus != Status.Cancellation);
 
         public RelayCommand SaveResultButton => new((o) => saveResult(), (o) => FileInfos.Count > 0);
+
+        public RelayCommand DoubleClickCommand => new((o) => showFile(o));
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
