@@ -7,7 +7,8 @@
         xmlns:vms="clr-namespace:WordFinder.Models"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vms:WindowModel}"
-        Title="Word Finder" Height="450" Width="800">
+        Title="Word Finder" Height="450" Width="800" MinHeight="300" MinWidth="550" >
+    
     <Window.Resources>
         <Style TargetType="Label">
             <Setter Property="FontSize" Value="14"/>
@@ -17,6 +18,7 @@
             <Setter Property="FontWeight" Value="DemiBold"/>
         </Style>
     </Window.Resources>
+    
     <Window.DataContext>
         <vms:WindowModel/>
     </Window.DataContext>
@@ -51,13 +53,13 @@
                 <DataGridTextColumn Header="Word count" Binding="{Binding Count}" Width="80"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Label Grid.Row="3"   Content="Status:"  />
+        <Label Grid.Row="3" Content="Status:"/>
         <Label Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"  Content="{Binding DisplayStatus}" FontWeight="Normal" />
-        <Label Grid.Row="4"  Content="Progress"  />
+        <Label Grid.Row="4" Content="Progress"  />
         <ProgressBar Minimum="0" Maximum="100" Value="{Binding Progress}" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Height="20" IsIndeterminate="{Binding ProgressBarIndeterminate}"/>
-        <Label Content="{Binding ProgressStr}"  Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"  HorizontalAlignment="Center" FontWeight="Normal" FontSize="11"/>
+        <Label Content="{Binding ProgressStr}"  Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"  HorizontalAlignment="Center" FontWeight="Normal"  Foreground="DarkGreen"/>
         <StackPanel Grid.Row ="4" Grid.Column="4" Orientation="Horizontal">
-            <Label  Content="files found:" />
+            <Label  Content="files found:"/>
             <Label  Content="{Binding FileInfos.Count}" FontWeight="Normal"/>
         </StackPanel>
     </Grid>

@@ -75,9 +75,14 @@ namespace WordFinder.Models
             if (sfd.ShowDialog() == true)
             {
                 using StreamWriter sw = new(sfd.FileName);
-                sw.WriteLine($"Word  -  \"{Word}\"");
+                sw.WriteLine($" Searching word  -  \"{Word}\"");
                 foreach (var file in FileInfos)
-                    sw.WriteLine($"{file.FilePath}\\{file.FileName} [word count  - {file.Count}]");
+                {
+                    sw.WriteLine(new string('-', file.FilePath.Length + 14));
+                    sw.WriteLine($" File name  : {file.FileName}");
+                    sw.WriteLine($" File path  : {file.FilePath}");
+                    sw.WriteLine($" Word count : {file.Count}");
+                }
             }
         }
 
@@ -132,7 +137,7 @@ namespace WordFinder.Models
                     {
                         string? text;
                         try { text = await File.ReadAllTextAsync(file, tk); } catch { return; }
-                        int wordCount = text?.Split(new char[] { '.', '?', '!', ' ', ';', ':', ',', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries)
+                        int wordCount = text?.Split(new char[] { '.', '?', '!', ' ', ';', ':', ',', '\n', '\r', '\t','"','\'' }, StringSplitOptions.RemoveEmptyEntries)
                                         .AsParallel().WithCancellation(tk).Where(x => x == Word).Count() ?? 0;
                         if (tk.IsCancellationRequested) return;
                         if (wordCount > 0)
