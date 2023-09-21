@@ -246,7 +246,7 @@ namespace WordFinder.Models
 
         public RelayCommand ScanFindButton => new((o) => findWord() ,(o) => (CurrentStatus == Status.Ready || CurrentStatus == Status.Idle) && Path.Exists(DirectoryPath) && !string.IsNullOrEmpty(Word));
 
-        public RelayCommand ExitStopButton => new((o) => exitStop(),(o) => CurrentStatus!=Status.Cancellation);
+        public RelayCommand ExitStopButton => new((o) => exitStop(),(o) => CurrentStatus != Status.Cancellation);
 
         public RelayCommand SaveResultButton => new((o) => saveResult(), (o) => FileInfos.Count > 0);
 
