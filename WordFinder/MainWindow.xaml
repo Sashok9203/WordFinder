@@ -17,6 +17,11 @@
             <Setter Property="Margin" Value="10,0,0,0"/>
             <Setter Property="FontWeight" Value="DemiBold"/>
         </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
     
     <Window.DataContext>
@@ -38,10 +43,10 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <Label Content="Directory" />
+        <Label Content="Directory"/>
         <Label Grid.Row="1" Content="Word to find" />
-        <TextBox Grid.Column="1" Grid.ColumnSpan="3" Height="30" Text="{Binding DirectoryPath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
-        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="30"  VerticalContentAlignment="Center" Text="{Binding Word,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Column="1" Grid.ColumnSpan="3"  Text="{Binding DirectoryPath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Word,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
         <Button Grid.Column="4" Margin="5,5,10,5" Content="Open directory" Command="{Binding OpenDirectory}"/>
         <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="Find word"  Command="{Binding ScanFindButton}"/>
         <Button Grid.Row="1" Grid.Column="4" Margin="5,5,10,5" Content="{Binding ExitStopButtonName}" Command="{Binding ExitStopButton}"/>
@@ -54,7 +59,7 @@
             </DataGrid.Columns>
             <DataGrid.InputBindings>
                 <MouseBinding  MouseAction="LeftDoubleClick" Command="{Binding DoubleClickCommand}" CommandParameter="{Binding ElementName=dataGrid, Path=SelectedItem}"/>
-            </DataGrid.InputBindings>
+             </DataGrid.InputBindings>
         </DataGrid>
         <Label Grid.Row="3" Content="Status:"/>
         <Label Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"  Content="{Binding DisplayStatus}" FontWeight="Normal" />
