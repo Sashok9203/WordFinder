@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -113,8 +112,7 @@ namespace WordFinder.Models
                     CurrentStatus = Status.Idle;
                     return;
                 }
-                else if (files.Count > 0)
-                        progressTick = (double)100 / files.Count;
+                else if (files.Count > 0) progressTick = (double)100 / files.Count;
                 else
                 {
                     CurrentStatus = Status.Idle;
@@ -172,7 +170,6 @@ namespace WordFinder.Models
 
         private void showFile(object o)
         {
-           
             if (o is FileInfo fi) 
                 new Process
                 {
