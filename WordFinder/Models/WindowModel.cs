@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -26,13 +27,21 @@ namespace WordFinder.Models
     internal class WindowModel :INotifyPropertyChanged
     {
         private Status status = Status.Idle;
+
         private string? path;
+
         private string? word;
+
         private int progress;
+
         private double progressTick;
+
         private double progressValue;
+
         private AutoResetEvent progressEvent = new(true);
+
         private CancellationTokenSource? tokenSource;
+
         private CancellationToken token;
 
         private List<string> files = new();
@@ -43,7 +52,7 @@ namespace WordFinder.Models
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 DirectoryPath = fbd.SelectedPath;
-                CurentStatus = Status.Idle;
+                CurrentStatus = Status.Idle;
                 clearInfo();
             }
         }
@@ -55,14 +64,31 @@ namespace WordFinder.Models
             progressValue = 0;
         }
 
-        private async void scanFind()
+        private void saveResult()
+        {
+            SaveFileDialog sfd = new()
+            {
+                Filter = "TXT files (*.txt)|*.txt|All files (*.*)|*.*",
+                FileName = "Result.txt",
+            };
+
+            if (sfd.ShowDialog() == true)
+            {
+                using StreamWriter sw = new(sfd.FileName);
+                sw.WriteLine($"Word  -  \"{Word}\"");
+                foreach (var file in FileInfos)
+                    sw.WriteLine($"{file.FilePath}\\{file.FileName} [word count  - {file.Count}]");
+            }
+        }
+
+        private async void findWord()
         {
             tokenSource?.Dispose();
             tokenSource = new();
             token = tokenSource.Token;
-            if (CurentStatus == Status.Idle)
+            if (CurrentStatus == Status.Idle)
             {
-                CurentStatus = Status.Scaning;
+                CurrentStatus = Status.Scaning;
                 await Task.Run(() =>
                 {
                    files.Clear();
@@ -76,14 +102,14 @@ namespace WordFinder.Models
                 }, token);
                 if (token.IsCancellationRequested)
                 {
-                    CurentStatus = Status.Idle;
+                    CurrentStatus = Status.Idle;
                     return;
                 }
                 else if (files.Count > 0)
                         progressTick = (double)100 / files.Count;
                 else
                 {
-                    CurentStatus = Status.Idle;
+                    CurrentStatus = Status.Idle;
                     MessageBox.Show("No files found in this directory", "Message");
                     return;
                 }
@@ -91,7 +117,7 @@ namespace WordFinder.Models
 
             clearInfo();
            
-            CurentStatus = Status.Searching;
+            CurrentStatus = Status.Searching;
             ParallelOptions parallelOptions = new()
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount,
@@ -131,22 +157,18 @@ namespace WordFinder.Models
                         await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => { Progress = temp; }));
                 });
             }
-            catch 
-            {
-
-            }
-            CurentStatus = Status.Ready;
+            catch {}
+            CurrentStatus = Status.Ready;
             if (FileInfos.Count == 0) MessageBox.Show("Word not found in this files","Message");
-            
         }
 
         private void exitStop()
         {
-            if (CurentStatus == Status.Idle || CurentStatus == Status.Ready) Application.Current.Shutdown();
+            if (CurrentStatus == Status.Idle || CurrentStatus == Status.Ready) Application.Current.Shutdown();
             else
             {
                 tokenSource?.Cancel();
-                CurentStatus = Status.Cancellation;
+                CurrentStatus = Status.Cancellation;
             }
         }
 
@@ -157,7 +179,6 @@ namespace WordFinder.Models
             {
                 path = value;
                 OnPropertyChanged();
-               // OnPropertyChanged(nameof(WordTextBoxEnabled));
             }
         }
 
@@ -171,8 +192,6 @@ namespace WordFinder.Models
             }
         }
 
-        public string? ProgressStr => progress == 0 ? null : $"{progress} %";
-        
         public int Progress
         {
             get => progress;
@@ -184,7 +203,7 @@ namespace WordFinder.Models
             }
         }
 
-        public Status CurentStatus 
+        public Status CurrentStatus 
         { 
             get => status;
             set
@@ -192,52 +211,40 @@ namespace WordFinder.Models
                 status = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ProgressBarIndeterminate));
-                //OnPropertyChanged(nameof(WordTextBoxEnabled));
                 OnPropertyChanged(nameof(ExitStopButtonName));
                 OnPropertyChanged(nameof(DisplayStatus));
                 CommandManager.InvalidateRequerySuggested();
             }
         }
 
-        public string DisplayStatus
+        public string DisplayStatus => CurrentStatus switch
         {
-            get
-            {
-                string result = string.Empty;
-                switch (CurentStatus)
-                {
-                    case Status.Cancellation:
-                        result = "Cancellation process...";
-                        break;
-                    case Status.Scaning:
-                        result = "Scaning directory...";
-                        break;
-                    case Status.Searching:
-                        result = "Word searching...";
-                        break;
-                    case Status.Ready:
-                        result = $"Ready to word searching ... {files.Count} files were found in the directory to search";
-                        break;
-                    case Status.Idle:
-                        result = "Ready to directory scaning...";
-                        break;
-                }
-                return result;
-            }
-        }
+            Status.Cancellation => "Cancellation process...",
+            Status.Scaning => "Scaning directory...",
+            Status.Searching => "Word searching...",
+            Status.Ready => $"Ready to word searching ... {files.Count} files were found in the directory to search",
+            Status.Idle => "Ready to directory scaning...",
+            _ => throw new NotImplementedException()
+        };
 
-       // public bool WordTextBoxEnabled => Path.Exists(DirectoryPath) && (CurentStatus == Status.Ready || CurentStatus == Status.Idle);
+        public string? ProgressStr => progress == 0 ? null : $"{progress} %";
 
-        public bool ProgressBarIndeterminate => CurentStatus == Status.Scaning;
+        public bool ProgressBarIndeterminate => CurrentStatus == Status.Scaning;
 
-        public string? ExitStopButtonName => CurentStatus == Status.Idle || CurentStatus == Status.Ready ? "Exit" : CurentStatus == Status.Cancellation ? "Cancellation ..." : "Stop";
+        public string? ExitStopButtonName => CurrentStatus == Status.Idle || CurrentStatus == Status.Ready ? "Exit" : CurrentStatus == Status.Cancellation ? "Cancellation ..." : "Stop";
 
         public ObservableCollection<FileInfo> FileInfos { get; set; } = new();
 
         public RelayCommand OpenDirectory => new((o)=>openDirectory());
-        public RelayCommand ScanFindButton => new((o) => scanFind() ,(o) => (CurentStatus == Status.Ready || CurentStatus == Status.Idle) && Path.Exists(DirectoryPath) && !string.IsNullOrEmpty(Word));
-        public RelayCommand ExitStopButton => new((o) => exitStop(),(o) => CurentStatus!=Status.Cancellation);
+
+        public RelayCommand ScanFindButton => new((o) => findWord() ,(o) => (CurrentStatus == Status.Ready || CurrentStatus == Status.Idle) && Path.Exists(DirectoryPath) && !string.IsNullOrEmpty(Word));
+
+        public RelayCommand ExitStopButton => new((o) => exitStop(),(o) => CurrentStatus!=Status.Cancellation);
+
+        public RelayCommand SaveResultButton => new((o) => saveResult(), (o) => FileInfos.Count > 0);
+
         public event PropertyChangedEventHandler? PropertyChanged;
+
         public void OnPropertyChanged([CallerMemberName] string? prop = null) => PropertyChanged?.Invoke(this, new(prop));
     }
 }
