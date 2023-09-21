@@ -251,7 +251,7 @@ namespace WordFinder.Models
 
         public RelayCommand OpenDirectory => new((o)=>openDirectory() ,(o) => CurrentStatus == Status.Ready || CurrentStatus == Status.Idle);
 
-        public RelayCommand ScanFindButton => new((o) => findWordAsync() ,(o) => (CurrentStatus == Status.Ready || CurrentStatus == Status.Idle) && Path.Exists(DirectoryPath) && !string.IsNullOrEmpty(Word));
+        public RelayCommand FindButton => new((o) => findWordAsync() ,(o) => (CurrentStatus == Status.Ready || CurrentStatus == Status.Idle) && Path.Exists(DirectoryPath) && !string.IsNullOrEmpty(Word));
 
         public RelayCommand ExitStopButton => new((o) => exitStop(),(o) => CurrentStatus != Status.Cancellation);
 
