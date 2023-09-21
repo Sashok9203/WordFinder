@@ -39,13 +39,13 @@ namespace WordFinder.Models
 
         private double progressValue;
 
-        private AutoResetEvent progressEvent = new(true);
+        private readonly AutoResetEvent progressEvent = new(true);
 
         private CancellationTokenSource? tokenSource;
 
         private CancellationToken token;
 
-        private List<string> files = new();
+        private readonly List<string> files = new();
 
         private readonly char[] splitChars = { '.', '?', '!', ' ', ';', ':', ',', '\n', '\r', '\t', '"', '\'' };
        
