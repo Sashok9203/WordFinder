@@ -81,10 +81,10 @@ namespace WordFinder.Models
                 sw.WriteLine($" Searching word  -  \"{Word}\"");
                 foreach (var file in FileInfos)
                 {
-                    sw.WriteLine(new string('-', file.FilePath.Length + 14));
-                    sw.WriteLine($" File name  : {file.FileName}");
-                    sw.WriteLine($" File path  : {file.FilePath}");
-                    sw.WriteLine($" Word count : {file.Count}");
+                    sw.WriteLine(new string('-', file?.FilePath?.Length ?? 0 + 14));
+                    sw.WriteLine($" File name  : {file?.FileName}");
+                    sw.WriteLine($" File path  : {file?.FilePath}");
+                    sw.WriteLine($" Word count : {file?.Count}");
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace WordFinder.Models
                 await Task.Run(() =>
                 {
                     files.Clear();
-                    var scanedfiles =  Directory.EnumerateFiles(DirectoryPath, "*.txt",new EnumerationOptions() { IgnoreInaccessible = true, RecurseSubdirectories = true });
+                    var scanedfiles =  Directory.EnumerateFiles(DirectoryPath ?? string.Empty, "*.txt",new EnumerationOptions() { IgnoreInaccessible = true, RecurseSubdirectories = true });
                     foreach (var file in scanedfiles) 
                     {
                         if (token.IsCancellationRequested) return;
@@ -172,14 +172,15 @@ namespace WordFinder.Models
 
         private void showFile(object o)
         {
-            FileInfo fi = o as FileInfo;
-            new Process
-            {
-                StartInfo = new ProcessStartInfo(Path.Combine(fi.FilePath, fi.FileName))
+           
+            if (o is FileInfo fi) 
+                new Process
                 {
-                    UseShellExecute = true
-                }
-            }.Start();
+                    StartInfo = new ProcessStartInfo(Path.Combine(fi?.FilePath ?? string.Empty, fi?.FileName ?? string.Empty))
+                    {
+                        UseShellExecute = true
+                    }
+                }.Start();
         }
 
         private void exitStop()
