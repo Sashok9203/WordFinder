@@ -173,7 +173,13 @@ namespace WordFinder.Models
         private void showFile(object o)
         {
             FileInfo fi = o as FileInfo;
-            Process.Start("notepad.exe",Path.Combine(fi.FilePath,fi.FileName));
+            new Process
+            {
+                StartInfo = new ProcessStartInfo(Path.Combine(fi.FilePath, fi.FileName))
+                {
+                    UseShellExecute = true
+                }
+            }.Start();
         }
 
         private void exitStop()
