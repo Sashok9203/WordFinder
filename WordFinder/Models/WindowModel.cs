@@ -45,6 +45,8 @@ namespace WordFinder.Models
         private CancellationToken token;
 
         private List<string> files = new();
+
+        private readonly char[] splitChars = { '.', '?', '!', ' ', ';', ':', ',', '\n', '\r', '\t', '"', '\'' };
        
         private void openDirectory()
         {
@@ -135,10 +137,10 @@ namespace WordFinder.Models
                     if (tk.IsCancellationRequested) return;
                     await Task.Run(async () =>
                     {
-                        string? text;
+                        string text = string.Empty;
                         try { text = await File.ReadAllTextAsync(file, tk); } catch { return; }
-                        int wordCount = text?.Split(new char[] { '.', '?', '!', ' ', ';', ':', ',', '\n', '\r', '\t','"','\'' }, StringSplitOptions.RemoveEmptyEntries)
-                                        .AsParallel().WithCancellation(tk).Where(x => x == Word).Count() ?? 0;
+                        int wordCount = text.Split(splitChars, StringSplitOptions.RemoveEmptyEntries)
+                                             .AsParallel().WithCancellation(tk).Where(x => x == Word).Count();
                         if (tk.IsCancellationRequested) return;
                         if (wordCount > 0)
                         {
@@ -240,7 +242,7 @@ namespace WordFinder.Models
 
         public ObservableCollection<FileInfo> FileInfos { get; set; } = new();
 
-        public RelayCommand OpenDirectory => new((o)=>openDirectory());
+        public RelayCommand OpenDirectory => new((o)=>openDirectory() ,(o) => CurrentStatus == Status.Ready || CurrentStatus == Status.Idle);
 
         public RelayCommand ScanFindButton => new((o) => findWord() ,(o) => (CurrentStatus == Status.Ready || CurrentStatus == Status.Idle) && Path.Exists(DirectoryPath) && !string.IsNullOrEmpty(Word));
 
