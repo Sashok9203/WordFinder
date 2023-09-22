@@ -80,7 +80,7 @@ namespace WordFinder.Models
                 sw.WriteLine($" Searching word  -  \"{Word}\"");
                 foreach (var file in FileInfos)
                 {
-                    sw.WriteLine(new string('-', file?.FilePath?.Length ?? 0 + 14));
+                    sw.WriteLine(new string('-', (file?.FilePath?.Length ?? 0) + 14));
                     sw.WriteLine($" File name  : {file?.FileName}");
                     sw.WriteLine($" File path  : {file?.FilePath}");
                     sw.WriteLine($" Word count : {file?.Count}");
