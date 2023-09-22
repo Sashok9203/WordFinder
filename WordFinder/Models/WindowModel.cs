@@ -43,8 +43,8 @@ namespace WordFinder.Models
         private CancellationTokenSource? tokenSource;
 
         private CancellationToken token;
-
-        private readonly List<string> files = new();
+       
+        private string[]? files;
 
         private readonly char[] splitChars = { '.', '?', '!', ' ', ';', ':', ',', '\n', '\r', '\t', '"', '\'' };
        
@@ -98,13 +98,13 @@ namespace WordFinder.Models
                 CurrentStatus = Status.Scaning;
                 await Task.Run(() =>
                 {
-                    files.Clear();
-                    var scanedfiles =  Directory.EnumerateFiles(DirectoryPath ?? string.Empty, "*.txt",new EnumerationOptions() { IgnoreInaccessible = true, RecurseSubdirectories = true });
-                    foreach (var file in scanedfiles) 
+                    try
                     {
-                        if (token.IsCancellationRequested) return;
-                        files.Add(file);
+                        files = Directory.EnumerateFiles(DirectoryPath ?? string.Empty, "*.txt", 
+                                                        new EnumerationOptions() { IgnoreInaccessible = true, RecurseSubdirectories = true })
+                                                            .AsParallel().WithCancellation(token).ToArray();
                     }
+                    catch { }
                 }, token);
 
                 if (token.IsCancellationRequested)
@@ -112,7 +112,7 @@ namespace WordFinder.Models
                     CurrentStatus = Status.Idle;
                     return;
                 }
-                else if (files.Count > 0) progressTick = (double)100 / files.Count;
+                else if (files?.Length > 0) progressTick = (double)100 / files.Length;
                 else
                 {
                     CurrentStatus = Status.Idle;
@@ -240,7 +240,7 @@ namespace WordFinder.Models
             Status.Cancellation => "Cancellation process...",
             Status.Scaning => "Scaning directory...",
             Status.Searching => "Word searching...",
-            Status.Ready => $"Ready to word searching ... {files.Count} files were found in the directory to search",
+            Status.Ready => $"Ready to word searching ... {files?.Length} files were found in the directory to search",
             Status.Idle => "Ready to directory scaning...",
             _ => throw new NotImplementedException()
         };
